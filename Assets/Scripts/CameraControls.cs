@@ -19,7 +19,7 @@ public class CameraControls : MonoBehaviour {
   void Start () {
     controls = new Controls();
     controls.Enable();
-    currentRotation = new(pitch.localRotation.eulerAngles.x, rotation.localRotation.eulerAngles.y);
+    currentRotation = new(rotation.localRotation.eulerAngles.y, pitch.localRotation.eulerAngles.x);
   }
 
   void Update () {
