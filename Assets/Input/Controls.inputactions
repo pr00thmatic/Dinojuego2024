@@ -48,6 +48,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Car",
+            "id": "f42d1632-cf8d-466e-b9db-a58a51918a91",
+            "actions": [
+                {
+                    "name": "SetDestination",
+                    "type": "Button",
+                    "id": "e44fb4c3-535b-4492-ba1f-f70ac6d1b4aa",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DestinationPosition",
+                    "type": "PassThrough",
+                    "id": "79d1ab7f-1e39-4998-a97d-97b583bb7158",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cdb1afe9-056e-4dd9-afd7-e2721b3cf171",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SetDestination",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dcfb6fc5-0433-4876-ac4d-1ca64455136c",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DestinationPosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

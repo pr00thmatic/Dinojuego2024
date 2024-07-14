@@ -70,6 +70,54 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Car"",
+            ""id"": ""f42d1632-cf8d-466e-b9db-a58a51918a91"",
+            ""actions"": [
+                {
+                    ""name"": ""SetDestination"",
+                    ""type"": ""Button"",
+                    ""id"": ""e44fb4c3-535b-4492-ba1f-f70ac6d1b4aa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DestinationPosition"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""79d1ab7f-1e39-4998-a97d-97b583bb7158"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""cdb1afe9-056e-4dd9-afd7-e2721b3cf171"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SetDestination"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dcfb6fc5-0433-4876-ac4d-1ca64455136c"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DestinationPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -78,6 +126,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_Rotation = m_Camera.FindAction("Rotation", throwIfNotFound: true);
         m_Camera_Holding = m_Camera.FindAction("Holding", throwIfNotFound: true);
+        // Car
+        m_Car = asset.FindActionMap("Car", throwIfNotFound: true);
+        m_Car_SetDestination = m_Car.FindAction("SetDestination", throwIfNotFound: true);
+        m_Car_DestinationPosition = m_Car.FindAction("DestinationPosition", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -189,9 +241,68 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         }
     }
     public CameraActions @Camera => new CameraActions(this);
+
+    // Car
+    private readonly InputActionMap m_Car;
+    private List<ICarActions> m_CarActionsCallbackInterfaces = new List<ICarActions>();
+    private readonly InputAction m_Car_SetDestination;
+    private readonly InputAction m_Car_DestinationPosition;
+    public struct CarActions
+    {
+        private @Controls m_Wrapper;
+        public CarActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @SetDestination => m_Wrapper.m_Car_SetDestination;
+        public InputAction @DestinationPosition => m_Wrapper.m_Car_DestinationPosition;
+        public InputActionMap Get() { return m_Wrapper.m_Car; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CarActions set) { return set.Get(); }
+        public void AddCallbacks(ICarActions instance)
+        {
+            if (instance == null || m_Wrapper.m_CarActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CarActionsCallbackInterfaces.Add(instance);
+            @SetDestination.started += instance.OnSetDestination;
+            @SetDestination.performed += instance.OnSetDestination;
+            @SetDestination.canceled += instance.OnSetDestination;
+            @DestinationPosition.started += instance.OnDestinationPosition;
+            @DestinationPosition.performed += instance.OnDestinationPosition;
+            @DestinationPosition.canceled += instance.OnDestinationPosition;
+        }
+
+        private void UnregisterCallbacks(ICarActions instance)
+        {
+            @SetDestination.started -= instance.OnSetDestination;
+            @SetDestination.performed -= instance.OnSetDestination;
+            @SetDestination.canceled -= instance.OnSetDestination;
+            @DestinationPosition.started -= instance.OnDestinationPosition;
+            @DestinationPosition.performed -= instance.OnDestinationPosition;
+            @DestinationPosition.canceled -= instance.OnDestinationPosition;
+        }
+
+        public void RemoveCallbacks(ICarActions instance)
+        {
+            if (m_Wrapper.m_CarActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ICarActions instance)
+        {
+            foreach (var item in m_Wrapper.m_CarActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_CarActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public CarActions @Car => new CarActions(this);
     public interface ICameraActions
     {
         void OnRotation(InputAction.CallbackContext context);
         void OnHolding(InputAction.CallbackContext context);
+    }
+    public interface ICarActions
+    {
+        void OnSetDestination(InputAction.CallbackContext context);
+        void OnDestinationPosition(InputAction.CallbackContext context);
     }
 }

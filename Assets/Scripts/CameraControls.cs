@@ -8,7 +8,8 @@ public class CameraControls : MonoBehaviour {
   public Transform rotation;
 
   [Header("Information")]
-  public Controls controls;
+  private Controls _controls;
+  public Controls Controls { get { if (_controls == null) _controls = new(); return _controls; } }
   public Vector2 input;
   public Vector2 currentRotation;
 
@@ -16,17 +17,20 @@ public class CameraControls : MonoBehaviour {
   public Vector2 speed = new(360, 90);
   public Vector2 clampPitch = new(0, 60);
 
-  void Start () {
-    controls = new Controls();
-    controls.Enable();
+  void OnEnable () {
+    Controls.Enable();
     currentRotation = new(rotation.localRotation.eulerAngles.y, pitch.localRotation.eulerAngles.x);
   }
 
+  void OnDisable () {
+    Controls.Disable();
+  }
+
   void Update () {
-    input = controls.Camera.Rotation.ReadValue<Vector2>() * Time.deltaTime;
+    input = Controls.Camera.Rotation.ReadValue<Vector2>() * Time.deltaTime;
     input.y *= -1;
 
-    if (controls.Camera.Holding.IsPressed()) {
+    if (Controls.Camera.Holding.IsPressed()) {
       currentRotation += Vector2.Scale(input, speed);
       currentRotation.y = Mathf.Clamp(currentRotation.y, clampPitch.x, clampPitch.y);
 
